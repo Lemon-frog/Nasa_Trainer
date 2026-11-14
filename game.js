@@ -23,26 +23,26 @@ const SYSTEMS = [
   {
     key: "L",
     icon: "",
-    name: "Life support",
-    hint: "Makes air. Needs 2 units a day to break even.",
+    name: "Air maker",
+    hint: "Makes air to breathe. Give it 2 power a day.",
   },
   {
     key: "G",
     icon: "",
-    name: "Greenhouse",
-    hint: "Grows food and a little air. 1 unit feeds the crew.",
+    name: "Garden",
+    hint: "Grows yummy food and a bit of air. 1 power feeds the crew.",
   },
   {
     key: "S",
     icon: "",
     name: "Storm shelter",
-    hint: "Shields the crew. 3 units blocks nearly all radiation.",
+    hint: "Keeps the crew safe from space rays. 3 power is best.",
   },
   {
     key: "R",
     icon: "",
     name: "Science lab",
-    hint: "Earns research points. Nothing else.",
+    hint: "Earns star points. That is all it does.",
   },
 ];
 
@@ -50,24 +50,24 @@ const SYSTEMS = [
 const STORMS = [
   {
     title: "Big solar flare (May 2024)",
-    fact: "In May 2024 strong flares caused the biggest geomagnetic storm in about 20 years. NASA’s DONKI database logs events like this.",
+    fact: "In May 2024 the Sun shot out huge flares. It was the biggest space storm in about 20 years. NASA writes down storms like this.",
   },
   {
     title: "Halloween solar storms (Oct 2003)",
-    fact: "Many huge flares hit within days in 2003. Spacecraft had to protect their electronics.",
+    fact: "In 2003 the Sun shot out many big flares in a few days. Spacecraft had to protect their gadgets.",
   },
   {
     title: "Giant flare (Aug 1972)",
-    fact: "This storm happened between Apollo 16 and 17. Astronauts on the Moon would have needed shelter fast.",
+    fact: "This storm came between two Moon trips. Astronauts on the Moon would have had to hide fast!",
   },
   {
     title: "Fast particle burst",
-    fact: "Charged particles from the Sun can arrive within hours, so warning time is short.",
+    fact: "Tiny bits from the Sun can zoom in within hours. There is not much time to get ready.",
   },
 ];
 const DUST = {
   title: "Mars dust storm",
-  fact: "In 2018 a global dust storm blocked so much sunlight that NASA’s Opportunity rover lost power.",
+  fact: "In 2018 dust covered all of Mars. NASA’s Opportunity rover got too little sun and ran out of power.",
 };
 const DELAYS = ["4 minutes", "9 minutes", "14 minutes", "20 minutes"]; // Earth-Mars signal time varies 3–22 min
 
@@ -77,12 +77,12 @@ const DELAYS = ["4 minutes", "9 minutes", "14 minutes", "20 minutes"]; // Earth-
 const EMERGENCIES = [
   {
     title: "Air leak!",
-    text: "A hissing sound! A small crack is letting air escape.",
+    text: "Hiss! A crack is letting air out.",
     choices: [
       {
         grade: "good",
-        label: "Find the leak and patch it",
-        cost: "Lose 1 research point",
+        label: "Find the crack and fix it",
+        cost: "Lose 1 star point",
         effect: { science: -1 },
         result: "The leak is sealed fast and almost no air was lost.",
         lesson: "Real crews find the leak first, then patch it.",
@@ -98,10 +98,10 @@ const EMERGENCIES = [
       },
       {
         grade: "bad",
-        label: "Turn up life support to cover it",
+        label: "Make extra air to cover it",
         cost: "Lose 3 air, and 2 less power tomorrow",
         effect: { air: -3, powerNext: -2 },
-        result: "Life support worked too hard and wore out.",
+        result: "Air maker worked too hard and wore out.",
         lesson: "Making more air does not fix a hole. It wastes power.",
       },
     ],
@@ -114,13 +114,13 @@ const EMERGENCIES = [
     },
   },
   {
-    title: "Surprise particle burst!",
-    text: "Sensors beep. Fast particles from the Sun are arriving with no warning.",
+    title: "Surprise space rays!",
+    text: "Beep beep! Fast bits from the Sun are coming!",
     choices: [
       {
         grade: "good",
-        label: "Go to the shielded shelter",
-        cost: "Lose 1 food (no time to harvest)",
+        label: "Hide in the safe shelter",
+        cost: "Lose 1 food (no time to pick it)",
         effect: { food: -1 },
         result: "The crew stayed safe behind thick walls.",
         lesson: "Crews plan a shielded safe room for exactly this.",
@@ -136,7 +136,7 @@ const EMERGENCIES = [
       {
         grade: "bad",
         label: "Finish the experiment first",
-        cost: "Gain 1 research point, but 3 radiation",
+        cost: "Win 1 star point, but get 3 radiation",
         effect: { science: 1, dose: 3 },
         result: "The experiment worked, but the crew took a big dose.",
         lesson: "Radiation dose adds up and cannot be undone.",
@@ -151,13 +151,13 @@ const EMERGENCIES = [
     },
   },
   {
-    title: "Greenhouse pump broke!",
+    title: "Garden pump broke!",
     text: "The water pump stopped. The plants are getting thirsty.",
     choices: [
       {
         grade: "good",
         label: "Swap in the spare part",
-        cost: "Lose 1 research point",
+        cost: "Lose 1 star point",
         effect: { science: -1 },
         result: "The pump works again and the plants are fine.",
         lesson: "Missions carry spare parts because help is far away.",
@@ -165,7 +165,7 @@ const EMERGENCIES = [
       {
         grade: "ok",
         label: "Water the plants by hand",
-        cost: "Lose 1 food and 1 research point",
+        cost: "Lose 1 food and 1 star point",
         effect: { food: -1, science: -1 },
         result: "Some plants made it, but it took all day.",
         lesson: "A workaround works, but fixing the cause is better.",
@@ -194,7 +194,7 @@ const EMERGENCIES = [
       {
         grade: "good",
         label: "Clean them with the robot arm",
-        cost: "Lose 1 research point",
+        cost: "Lose 1 star point",
         effect: { science: -1 },
         result: "The panels shine again and power is back.",
         lesson: "Robots can do dusty jobs without risking the crew.",
@@ -210,7 +210,7 @@ const EMERGENCIES = [
       {
         grade: "bad",
         label: "Ignore it",
-        cost: "Lose 2 research points, and 2 less power tomorrow",
+        cost: "Lose 2 star points, and 2 less power tomorrow",
         effect: { science: -2, powerNext: -2 },
         result: "More dust piled up and power kept falling.",
         lesson: "Dust builds up, so waiting makes it worse.",
@@ -229,52 +229,52 @@ const EMERGENCIES = [
 // Daily "question from Earth". Put the right answer in "right"; answers are shuffled when shown.
 const QUIZ = [
   {
-    q: "How long does a message take to travel one way between Earth and Mars?",
+    q: "How long does a message take to get from Earth to Mars?",
     right: "3 to 22 minutes",
     wrong: ["About 1 second", "About 2 days"],
-    why: "It depends on where the planets are in their orbits.",
+    why: "It depends on where the planets are.",
   },
   {
-    q: "What can send dangerous radiation toward astronauts?",
+    q: "What can send harmful space rays at astronauts?",
     right: "Solar flares",
     wrong: ["Moon dust", "Mars wind"],
-    why: "NASA’s DONKI database tracks flares and other space weather.",
+    why: "NASA keeps a list of flares and space weather.",
   },
   {
-    q: "Why do astronauts go into a shelter during a solar storm?",
+    q: "Why do astronauts hide in a shelter in a solar storm?",
     right: "It blocks radiation",
     wrong: ["It is quieter", "It is warmer"],
-    why: "Thick walls and supplies stop many fast particles.",
+    why: "Thick walls stop many fast bits from the Sun.",
   },
   {
     q: "What do we call one day on Mars?",
     right: "A sol",
     wrong: ["A moon", "A rover"],
-    why: "A sol is about 24 hours and 39 minutes.",
+    why: "A sol is a little longer than a day on Earth.",
   },
   {
-    q: "What blocked the Sun from NASA’s Opportunity rover in 2018?",
+    q: "What hid the Sun from the Opportunity rover in 2018?",
     right: "A giant dust storm",
     wrong: ["A volcano", "A comet"],
-    why: "Without sunlight its solar panels could not make power.",
+    why: "With no sun, its panels could not make power.",
   },
   {
-    q: "How can a greenhouse help astronauts?",
+    q: "How can a garden help astronauts?",
     right: "It grows food and some air",
     wrong: ["It makes rocket fuel", "It sends radio signals"],
-    why: "Plants take in carbon dioxide and make oxygen.",
+    why: "Plants take in the air we breathe out and make fresh air.",
   },
   {
-    q: "Does Mars have a thick atmosphere that blocks radiation?",
+    q: "Does Mars have thick air that blocks space rays?",
     right: "No, it is very thin",
     wrong: ["Yes, thicker than Earth’s", "Yes, the same as Earth’s"],
-    why: "That is one reason Mars crews need shielding.",
+    why: "That is why Mars crews need a safe shelter.",
   },
   {
-    q: "What does NASA’s DONKI database keep track of?",
+    q: "What does NASA’s DONKI list keep track of?",
     right: "Space weather events",
     wrong: ["Rocket prices", "Rover paint colors"],
-    why: "DONKI records flares and eruptions from the Sun.",
+    why: "DONKI lists flares and big bursts from the Sun.",
   },
 ];
 
@@ -342,28 +342,28 @@ const UPGRADES = [
     key: "walls",
     icon: "",
     name: "Thicker shelter walls",
-    desc: "Blocks 1 more radiation in every storm.",
+    desc: "Blocks more space rays in storms.",
     costs: [12, 25],
   },
   {
     key: "tanks",
     icon: "",
     name: "Bigger tanks",
-    desc: "Start with +2 air and +2 food, and store more.",
+    desc: "Start with more air and food.",
     costs: [10, 20],
   },
   {
     key: "seeds",
     icon: "",
-    name: "Hardy seeds",
-    desc: "Each greenhouse unit grows 1 more food.",
+    name: "Tough seeds",
+    desc: "Your garden grows more food.",
     costs: [20],
   },
   {
     key: "drills",
     icon: "⏱",
-    name: "Emergency drills",
-    desc: "+4 seconds to decide in emergencies.",
+    name: "Practice drills",
+    desc: "More time to decide in surprises.",
     costs: [8, 16],
   },
 ];
@@ -372,15 +372,15 @@ const ITEMS = [
   {
     key: "warning",
     icon: "",
-    name: "Early-warning satellite",
-    desc: "Next mission only: see storms 2 days ahead.",
+    name: "Storm-spotter satellite",
+    desc: "Next trip only: see storms 2 days early.",
     cost: 6,
   },
   {
     key: "battery",
     icon: "",
     name: "Battery pack",
-    desc: "Next mission only: +3 power on a day you choose.",
+    desc: "Next trip only: +3 power on a day you pick.",
     cost: 8,
   },
 ];
@@ -435,6 +435,7 @@ function newGame() {
     result: null,
   };
   render();
+  fresh();
 }
 
 /* ---------- RULES ---------- */
@@ -462,9 +463,9 @@ function finishDay(prenotes = []) {
     ev = todayEvent(),
     notes = [...prenotes];
 
-  // Air: crew uses 4 a day. Life support adds 2 per unit, greenhouse adds 1 per unit.
+  // Air: crew uses 4 a day. Air maker adds 2 per unit, garden adds 1 per unit.
   const airChange = -4 + 2 * a.L + a.G;
-  // Food: crew eats 2 a day. Greenhouse grows 2 per unit.
+  // Food: crew eats 2 a day. Garden grows 2 per unit.
   const foodChange = -2 + (2 + lv("seeds")) * a.G;
   game.air = Math.min(game.maxStock, game.air + airChange);
   game.food = Math.min(game.maxStock, game.food + foodChange);
@@ -478,13 +479,13 @@ function finishDay(prenotes = []) {
     dose += hit;
     notes.push(
       hit > 0
-        ? `Radiation got through! Dose +${hit}.`
+        ? `Space rays got in! Radiation +${hit}.`
         : "The shelter protected the crew!",
     );
   }
   game.dose += dose;
   game.science += a.R;
-  if (a.R) notes.push(`+${a.R} research point${a.R > 1 ? "s" : ""}.`);
+  if (a.R) notes.push(`+${a.R} star point${a.R > 1 ? "s" : ""}.`);
   game.report = `<b>Day ${game.sol} report:</b> ${notes.join(" ") || "A calm day."}`;
 
   // Win or lose?
@@ -503,6 +504,7 @@ function finishDay(prenotes = []) {
   if (game.result) award();
   render();
   window.scrollTo(0, 0);
+  fresh();
 }
 
 /* ---------- EMERGENCY POP-UP WITH COUNTDOWN ---------- */
@@ -529,9 +531,9 @@ function showEmergency(em) {
   const box = popup(`
     <h2>${em.title}</h2><p>${em.text}</p>
     <div class="timer"><i></i></div>
-    <p class="count">Decide in <b>${left}</b> seconds!</p>
+    <p class="count">Hurry! <b>${left}</b> seconds left!</p>
     ${opts.map((c, i) => `<button class="choice" data-i="${i}"><b>${c.label}</b><small>${c.cost}</small></button>`).join("")}
-    <p class="fact">Earth would take about ${DELAYS[game.sol % 4]} to answer, which is too slow. You decide!</p>`);
+    <p class="fact">Earth is too far away to help in time. You decide!</p>`);
 
   const bar = box.querySelector(".timer i"),
     num = box.querySelector(".count b");
@@ -555,7 +557,7 @@ const CHIPS = {
   air: "Air",
   food: "Food",
   dose: "Radiation",
-  science: "Research",
+  science: "Stars",
   powerNext: "Power tomorrow",
 };
 const GRADES = { good: "Great choice!", ok: "Not bad", bad: "Risky choice" };
@@ -578,6 +580,7 @@ function applyEmergency(choice, timedOut) {
     )
     .join("");
   const grade = timedOut ? "bad" : choice.grade;
+  if (grade === "good") confetti(26);
   const box = popup(`
     <h2 class="g-${grade}">${timedOut ? "⏰ Time ran out!" : GRADES[grade]}</h2>
     <p>${choice.result}</p><div class="chips">${chips}</div>
@@ -597,30 +600,32 @@ function showMain() {
     <div class="hero">
       <svg class="logo" width="96" height="96" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="#c4553b" stroke="#1e1a3c" stroke-width="4"/><ellipse cx="32" cy="34" rx="30" ry="9" fill="none" stroke="#ffc933" stroke-width="4" transform="rotate(-20 32 34)"/><circle cx="24" cy="26" r="4" fill="#8e3a3a"/><circle cx="38" cy="40" r="3" fill="#8e3a3a"/></svg>
       <h1>Mars Outpost</h1>
-      <p class="sub">Can you keep your crew alive for ${CONFIG.totalSols} days?</p>
+      <p class="sub">Can you keep your crew safe for ${CONFIG.totalSols} days?</p>
     </div>
     <button class="go" onclick="startMission()">▶ Play</button>
     <button class="go alt" onclick="showMenu()">Upgrades <span class="pill">${save.points}</span></button>
     <button class="go alt" onclick="showHow()">How to play</button>`;
   window.scrollTo(0, 0);
+  fresh();
 }
 
 function showHow() {
   app.innerHTML = `
     <h1>How to play</h1>
     <div class="card"><h2>Your job</h2>
-      <p>Each day you get a few <b>power units</b>. Share them between life support, the greenhouse, the storm shelter and the science lab. Press <b>Run Day</b> to see what happens.</p>
-      <p>Power is never enough for everything, so every choice has a cost.</p></div>
+      <p>Each day you get some <b>power</b>. Share it with the air maker, the garden, the storm shelter and the science lab. Then press <b>Run Day</b>!</p>
+      <p>You cannot power everything. Pick with care!</p></div>
     <div class="card"><h2>Watch out for</h2>
-      <p><b>Radiation storms</b>: power the shelter when the forecast warns you.</p>
-      <p><b>Dust storms</b>: less sunlight means less power.</p>
-      <p><b>Emergencies</b>: pick fast before the timer runs out!</p></div>
+      <p><b>Space ray storms</b>: turn on the shelter when the forecast says so.</p>
+      <p><b>Dust storms</b>: less sun means less power.</p>
+      <p><b>Surprises</b>: pick fast before the timer ends!</p></div>
     <div class="card"><h2>After the mission</h2>
-      <p>Research points you earn can buy upgrades for your next mission.</p></div>
-    <div class="card"><h2>Real NASA science</h2>
-      <p class="fact">The storms and dust storms are based on real, archived NASA records: DONKI space weather (May 2024 and Oct 2003 storms), the 1972 Apollo-era flare, and the 2018 Mars dust storm that stopped the Opportunity rover. They are not live data. Game numbers are simplified for play.</p></div>
+      <p>Star points you win can buy upgrades for your next trip.</p></div>
+    <div class="card"><h2>Real NASA facts</h2>
+      <p class="fact">These storms really happened! NASA wrote them down long ago. The game is not live, and the numbers are made easy.</p></div>
     <button class="go" onclick="showMain()">◀ Back</button>`;
   window.scrollTo(0, 0);
+  fresh();
 }
 
 /* ---------- RESEARCH POINTS + UPGRADE MENU ---------- */
@@ -687,15 +692,16 @@ function showMenu() {
   ).join("");
   app.innerHTML = `
     <h1>Mars Outpost</h1>
-    <p class="sub">Get your crew through ${CONFIG.totalSols} days. Spend research points to make the next mission safer.</p>
-    <div class="card"><h2>${save.points} research points</h2>
-      <p class="fact">Earn points from the science lab each mission, plus 10 for surviving.</p></div>
+    <p class="sub">Spend star points to make your next trip safer.</p>
+    <div class="card"><h2>${save.points} star points</h2>
+      <p class="fact">Win stars in the science lab. Finish the trip for 10 more!</p></div>
     <div class="card"><h2>Upgrades</h2><p class="fact">These stay forever.</p>${ups}</div>
-    <div class="card"><h2>Pack for next mission</h2><p class="fact">These are used up on your next mission.</p>${items}</div>
+    <div class="card"><h2>Pack for your next trip</h2><p class="fact">You use these up on your next trip.</p>${items}</div>
     <button class="go" onclick="startMission()">Start mission ▶</button>
     <button class="go alt" onclick="showMain()">◀ Main menu</button>
     <p class="fact" style="text-align:center"><a href="#" onclick="resetSave();return false" style="color:inherit">Reset progress</a></p>`;
   window.scrollTo(0, 0);
+  fresh();
 }
 
 /* ---------- ACTIVITIES: forecast, Earth quiz, rover mini-game ---------- */
@@ -725,10 +731,10 @@ function forecastStrip() {
       ? ""
       : nx
         ? nx.type === "storm"
-          ? `<div class="advice storm"><b>Radiation storm tomorrow!</b> Plan to put 3 power into the Storm shelter tomorrow.</div>`
-          : `<div class="advice dust"><b>Dust storm tomorrow!</b> You will only have ${CONFIG.dustPower + lv("panels")} power. Stock up on air and food today.</div>`
+          ? `<div class="advice storm"><b>Space ray storm tomorrow!</b> Put 3 power in the Storm shelter.</div>`
+          : `<div class="advice dust"><b>Dust storm tomorrow!</b> You will only have ${CONFIG.dustPower + lv("panels")} power. Fill up on air and food today.</div>`
         : `<div class="advice calm">Tomorrow looks calm. A good time for science!</div>`;
-  return `<div class="card"><h2>Mission Control forecast</h2><div class="fgrid">${tiles}</div>${advice}</div>`;
+  return `<div class="card"><h2>Space weather forecast</h2><div class="fgrid">${tiles}</div>${advice}</div>`;
 }
 
 function quizCard() {
@@ -736,10 +742,10 @@ function quizCard() {
     Q = QUIZ[game.quizOrder[(d - 1) % QUIZ.length]],
     res = game.quizRes[d];
   if (res)
-    return `<div class="act"><b>Question from Earth</b><p class="fact">${res.ok ? "Correct! +1 research point." : "Not quite. The answer is: " + Q.right + "."} ${Q.why}</p></div>`;
+    return `<div class="act"><b>Question from Earth</b><p class="fact">${res.ok ? "Yay! +1 star point!" : "Oops! The answer is: " + Q.right + "."} ${Q.why}</p></div>`;
   if (!game.quizOpts[d])
     game.quizOpts[d] = [Q.right, ...Q.wrong].sort(() => Math.random() - 0.5);
-  return `<div class="act"><b>Quick question from Earth</b> <small>(+1 research point)</small><p>${Q.q}</p>
+  return `<div class="act"><b>Quick question from Earth</b> <small>(+1 star point)</small><p>${Q.q}</p>
     ${game.quizOpts[d].map((o, i) => `<button class="opt" onclick="answerQuiz(${i})">${o}</button>`).join("")}</div>`;
 }
 function answerQuiz(i) {
@@ -747,14 +753,17 @@ function answerQuiz(i) {
     Q = QUIZ[game.quizOrder[(d - 1) % QUIZ.length]];
   const ok = game.quizOpts[d][i] === Q.right;
   game.quizRes[d] = { ok };
-  if (ok) game.science++;
+  if (ok) {
+    game.science++;
+    confetti(20);
+  }
   render();
 }
 
 function roverButton() {
   if (game.roverDay === game.sol)
     return `<div class="act"><b>Rover</b><p class="fact">The rover is charging. Send it again tomorrow.</p></div>`;
-  return `<button class="item" onclick="startRover()" ${used() >= power() ? "disabled" : ""}>${ic("rover")} Rover sample mission<br><small>Costs 1 power. Tap rocks to earn up to 4 research points.</small></button>`;
+  return `<button class="item" onclick="startRover()" ${used() >= power() ? "disabled" : ""}>${ic("rover")} Rover rock hunt<br><small>Costs 1 power. Tap rocks to win up to 4 star points!</small></button>`;
 }
 function startRover() {
   if (used() >= power() || game.roverDay === game.sol) return;
@@ -764,15 +773,15 @@ function startRover() {
   let left = 10,
     got = 0;
   const box =
-    popup(`<h2>Rover sample mission</h2><p>Tap the rocks before they roll away!</p>
-    <p class="count">⏱<b>${left}</b>s · Samples: <span id="got">0</span></p><div class="arena"></div>`);
+    popup(`<h2>Rover rock hunt</h2><p>Tap the rocks before they roll away!</p>
+    <p class="count">⏱<b>${left}</b>s · Rocks: <span id="got">0</span></p><div class="arena"></div>`);
   const arena = box.querySelector(".arena"),
     gotEl = box.querySelector("#got"),
     num = box.querySelector(".count b");
   const sp = setInterval(() => {
     const r = document.createElement("button");
     r.className = "rock";
-    r.textContent = "";
+    r.textContent = "🪨";
     r.style.left = Math.random() * 80 + "%";
     r.style.top = Math.random() * 75 + "%";
     r.onclick = () => {
@@ -791,9 +800,10 @@ function startRover() {
     clearInterval(sp);
     const pts = Math.min(4, Math.floor(got / 2));
     game.science += pts;
-    box.querySelector(".alert").innerHTML = `<h2>${got} samples collected!</h2>
-      <p>${pts ? "+" + pts + " research points!" : "No points this time. Try again tomorrow!"}</p>
-      <p class="fact">Real rovers like Curiosity and Perseverance collect rocks to study Mars. Their power is limited too.</p>
+    if (pts) confetti(24);
+    box.querySelector(".alert").innerHTML = `<h2>${got} rocks collected!</h2>
+      <p>${pts ? "+" + pts + " star points!" : "No points this time. Try again tomorrow!"}</p>
+      <p class="fact">Real rovers like Curiosity and Perseverance pick up rocks to learn about Mars!</p>
       <button class="go" id="ok">Back to base ▶</button>`;
     box.querySelector("#ok").onclick = () => {
       box.remove();
@@ -837,7 +847,7 @@ const MESSAGES = [
   {
     from: "Class 5, Earth School",
     icon: "",
-    text: "We are growing beans in class, just like your greenhouse!",
+    text: "We are growing beans in class, just like your garden!",
   },
   {
     from: "Engineer Sam",
@@ -852,7 +862,7 @@ const MESSAGES = [
   {
     from: "Chef Amara",
     icon: "",
-    text: "One greenhouse unit feeds the crew for a day. Plants make a little air too!",
+    text: "One garden unit feeds the crew for a day. Plants make a little air too!",
   },
   {
     from: "Mission Control",
@@ -870,37 +880,37 @@ function todaysMessages() {
   if (ev?.type === "storm")
     hot = {
       ...MC,
-      text: "RADIATION ALERT! Everyone to the shelter. Power it up now!",
+      text: "ALERT! Space rays are here! Everyone to the shelter!",
       urgent: true,
     };
   else if (nx?.type === "storm")
     hot = {
       ...MC,
-      text: "Our solar scouts spotted a flare. A storm reaches you tomorrow. Plan your shelter power.",
+      text: "We saw a flare! A storm comes tomorrow. Get the shelter ready.",
       urgent: true,
     };
   else if (nx?.type === "dust")
     hot = {
       ...MC,
-      text: "A big dust cloud is rolling in. Tomorrow’s sunshine will be weak. Stock up today.",
+      text: "A big dust cloud is coming. Tomorrow has less sun. Fill up today!",
       urgent: true,
     };
   else if (game.air <= 3)
     hot = {
       ...MC,
-      text: "Your air is getting low. Put more power into life support!",
+      text: "Air is low! Give the air maker more power!",
       urgent: true,
     };
   else if (game.food <= 3)
     hot = {
       ...MC,
-      text: "Food is low. Don’t forget the greenhouse!",
+      text: "Food is low. Give the garden some power!",
       urgent: true,
     };
   else if (game.dose >= 6)
     hot = {
       ...MC,
-      text: "Your radiation dose is high. Spend more time in the shelter.",
+      text: "Radiation is high. Use the shelter more.",
       urgent: true,
     };
   const list = [
@@ -921,10 +931,10 @@ function newsPanel() {
   const ev = todayEvent(),
     lines = [];
   if (ev?.type === "storm")
-    lines.push("BREAKING: Radiation storm hits the outpost!");
+    lines.push("BREAKING: Space ray storm!");
   else if (ev?.type === "dust")
     lines.push("BREAKING: Dust storm cuts solar power!");
-  else lines.push(`Crew has earned ${game.science} research points so far.`);
+  else lines.push(`Crew has earned ${game.science} star points so far.`);
   for (let i = 0; i < 3; i++)
     lines.push(NEWS[(game.sol * 3 + i) % NEWS.length]);
   return `<div class="card"><h2>Mars Daily</h2><small class="fact">Day ${game.sol} edition</small>
@@ -1037,7 +1047,7 @@ function camPanel() {
       <path d="M70 198v-22l24-17 24 17v22z" fill="#9ff0c9" ${st}/>${plants}${lamp(a.G, 94, 178)}
       <path d="M128 198v-20h46v20z" fill="#ffc933" ${st}/>${lamp(a.S, 151, 189)}
       <path d="M190 198v-24h40v24z" fill="#d9d2ff" ${st}/><path d="M210 174v-14" ${st}/><circle class="${a.R ? "dish" : ""}" cx="210" cy="157" r="4" fill="${a.R ? "#ff5a6e" : "#6b6690"}" stroke="#1e1a3c" stroke-width="2"/>${sparks}${lamp(a.R, 210, 188)}
-      ${shield}
+      ${t === "calm" ? '<text class="roam" x="4" y="214" font-size="15">🚙</text>' : ""}${shield}
       ${t === "dust" ? '<rect width="260" height="220" fill="#b8742f" opacity=".3"/>' : ""}
     </svg>
     <p class="fact">${caption}</p></div>`;
@@ -1062,7 +1072,7 @@ function crewPanel() {
     ok: "The crew is happy and healthy!",
     air: "We need more air!",
     food: "Our tummies are rumbling!",
-    dose: hit > 0 ? "Radiation is coming! Power the shelter!" : "Too much radiation. Let's shelter!",
+    dose: hit > 0 ? "Radiation is coming! Power the shelter!" : "Too much radiation. Hide in the shelter!",
   }[mood];
   const eyes =
     '<circle cx="26" cy="29" r="2.6" fill="#fff"/><circle cx="38" cy="29" r="2.6" fill="#fff"/>';
@@ -1075,7 +1085,7 @@ function crewPanel() {
   };
   const suits = ["#62c3ff", "#35d8a0", "#ffc933"];
   const astro = (i) =>
-    `<svg class="astro" width="80" height="88" viewBox="0 0 64 70" style="animation-delay:${i * 0.6}s" aria-hidden="true">
+    `<svg class="astro ${mood}" width="80" height="88" viewBox="0 0 64 70" style="animation-delay:${i * 0.6}s" aria-hidden="true">
       <path d="M8 70a24 20 0 0 1 48 0z" fill="${suits[i]}" stroke="#1e1a3c" stroke-width="3"/>
       <circle cx="32" cy="30" r="22" fill="#f4f1ff" stroke="#1e1a3c" stroke-width="3"/>
       <rect x="15" y="18" width="34" height="26" rx="13" fill="#2b2a5e" stroke="#1e1a3c" stroke-width="2"/>
@@ -1097,7 +1107,7 @@ function signalPanel() {
       <circle cx="225" cy="36" r="3" fill="#8e3a3a"/><circle cx="234" cy="46" r="2" fill="#8e3a3a"/>
       <g class="pkt"><rect x="52" y="34" width="16" height="11" rx="2" fill="#ffc933" stroke="#1e1a3c" stroke-width="2"/><path d="M52 35l8 5 8-5" fill="none" stroke="#1e1a3c" stroke-width="2"/></g>
     </svg>
-    <p class="fact">Your messages take about <b>${DELAYS[game.sol % 4]}</b> to reach Earth, so the crew decides alone.</p></div>`;
+    <p class="fact">Messages take about <b>${DELAYS[game.sol % 4]}</b> to reach Earth.</p></div>`;
 }
 
 // Mission trail: one dot per day. Known storm and dust days are tinted.
@@ -1131,9 +1141,9 @@ function render() {
 
   let eventCard = "";
   if (ev?.type === "storm")
-    eventCard = `<div class="card warn"><h2>Radiation storm today!</h2><p><b>${ev.data.title}.</b> Radiation hits the base this day. Power the shelter to protect the crew.</p><p class="fact">${ev.data.fact}</p></div>`;
+    eventCard = `<div class="card warn"><h2>Space ray storm today!</h2><p><b>${ev.data.title}.</b> Space rays hit the base today. Turn on the shelter to keep the crew safe!</p><p class="fact">${ev.data.fact}</p></div>`;
   if (ev?.type === "dust")
-    eventCard = `<div class="card warn"><h2>${ev.data.title}!</h2><p>Dust blocks the Sun. Power drops to <b>${p} units</b> today.</p><p class="fact">${ev.data.fact}</p></div>`;
+    eventCard = `<div class="card warn"><h2>${ev.data.title}!</h2><p>Dust hides the Sun. You only have <b>${p} power</b> today.</p><p class="fact">${ev.data.fact}</p></div>`;
 
   const cells = Array.from(
     { length: Math.max(p, CONFIG.normalPower + lv("panels")) },
@@ -1143,14 +1153,14 @@ function render() {
 
   const sgn = (n) => (n > 0 ? "+" + n : n < 0 ? "−" + Math.abs(n) : "0");
   const pr = projection();
-  const proj = `<div class="proj"><b>If you run this day:</b>
+  const proj = `<div class="proj"><b>What will happen:</b>
     <span class="${pr.air < 0 ? "neg" : "pos"}">${ic("L")} Air ${sgn(pr.air)}</span>
     <span class="${pr.food < 0 ? "neg" : "pos"}">${ic("food")} Food ${sgn(pr.food)}</span>
     <span class="${pr.dose > 0 ? "neg" : "pos"}">${ic("dose")} Radiation ${sgn(pr.dose)}</span></div>`;
   const systems = SYSTEMS.map(
     (s) => `
     <div class="mod m-${s.key}">
-      <div class="mh">${ic(s.key)}<b>${s.name}</b></div>
+      <div class="mh">${ic(s.key)}<b>${s.name}</b><span class="emo">${{ L: "💨", G: "🌱", S: "🛡️", R: "🔬" }[s.key]}</span></div>
       <p class="hint">${s.hint}</p>
       <div class="slots">${[1, 2, 3, 4].map((i) => `<i class="${i <= game.alloc[s.key] ? "on" : ""}"></i>`).join("")}</div>
       <div class="stepper">
@@ -1166,26 +1176,26 @@ function render() {
     <button class="back" onclick="quitMission()">◀ Menu</button>
     ${mobileMsg()}
     <h1>Mars Outpost</h1>
-    <p class="sub">Keep your crew alive for ${CONFIG.totalSols} days on Mars.</p>
+    <p class="sub">Keep your crew safe on Mars for ${CONFIG.totalSols} days!</p>
     <div class="card hud">
       ${trail()}
-      <p class="fact">Day ${game.sol} of ${CONFIG.totalSols} · Research points: <b>${game.science}</b></p>
+      <p class="fact">Day ${game.sol} of ${CONFIG.totalSols} · Star points: <b>${game.science}</b></p>
       <div class="meters">
         ${meter("L", "Air", game.air, game.maxStock, (v) => v <= 3)}
         ${meter("food", "Food", game.food, game.maxStock, (v) => v <= 3)}
         ${meter("dose", "Radiation", game.dose, CONFIG.doseLimit, (v) => v >= 6)}
       </div>
-      <p class="fact">Radiation dose never goes down. At ${CONFIG.doseLimit}, the crew must go home.</p>
+      <p class="fact">Radiation never goes down. At ${CONFIG.doseLimit}, the crew goes home.</p>
     </div>
     ${game.report ? `<div class="card news">${game.report}</div>` : ""}
     ${forecastStrip()}
-    ${game.penalty[game.sol] ? `<div class="card warn"><h2>Damage from yesterday</h2><p>Broken equipment means <b>${game.penalty[game.sol]} less power</b> today.</p></div>` : ""}
+    ${game.penalty[game.sol] ? `<div class="card warn"><h2>Oh no, damage!</h2><p>Broken stuff means <b>${game.penalty[game.sol]} less power</b> today.</p></div>` : ""}
     ${eventCard}
     <div class="card">
-      ${scene()}<h2>Power: ${used()} of ${p} units</h2>
+      ${scene()}<h2>Power: ${used()} of ${p}</h2>
       <div class="cells">${cells}</div>
       <div class="mods">${systems}</div>${proj}
-      <p class="fact">Messages from Earth take about ${DELAYS[game.sol % 4]} to arrive, so you decide.</p>
+      <p class="fact">Messages from Earth are slow, so you decide!</p>
       <div class="acts">${quizCard()}${roverButton()}</div>
       ${game.battery > 0 && game.batteryDay !== game.sol ? `<button class="item" onclick="useBattery()">${ic("battery")} Use battery pack (+3 power today)</button>` : ""}
       <button class="go" onclick="runSol()">Run Day ${game.sol} ▶</button>
@@ -1195,24 +1205,27 @@ function render() {
 function renderEnd() {
   app.className = "";
   const msg = {
-    win: `You made it! ${game.science} research points.`,
-    air: "The air ran out.",
-    food: "The food ran out.",
-    dose: "The crew reached the radiation limit and had to go home.",
+    win: `You did it! ${game.science} star points!`,
+    air: "Oh no! The air ran out.",
+    food: "Oh no! The food ran out.",
+    dose: "Too many space rays. The crew went home.",
   }[game.result];
   app.innerHTML = `
+    <div class="trophy ${game.result === "win" ? "win" : "lose"}">${game.result === "win" ? "🏆" : "😢"}</div>
     <h1>${msg}</h1>
     <div class="card"><h2>What you learned</h2>
-      <p><b>Power is limited.</b> Every unit for science was a unit not used to stay safe.</p>
-      <p><b>Space weather matters.</b> Mission planners watch NASA’s DONKI database for flares, then decide when to shelter.</p>
-      <p><b>Mars can surprise you.</b> Dust storms cut solar power, like the one in 2018 that stopped the Opportunity rover.</p>
-      <p><b>Help is far away.</b> Signals between Earth and Mars take 3 to 22 minutes, so crews decide on their own.</p>
+      <p><b>Power is small.</b> Power used for science cannot be used to stay safe.</p>
+      <p><b>Space weather matters.</b> NASA watches the Sun to know when to hide.</p>
+      <p><b>Mars has surprises.</b> Dust storms hide the Sun, like the one that stopped Opportunity.</p>
+      <p><b>Help is far away.</b> Messages take 3 to 22 minutes, so crews decide on their own.</p>
     </div>
-    <div class="card news"><h2>You earned ${game.earned} research points!</h2>
+    <div class="card news"><h2>You earned ${game.earned} star points!</h2>
       <p>${game.science} from science${game.result === "win" ? " + 10 for surviving" : ""}. You now have <b>${save.points}</b> to spend.</p></div>
     <button class="go" onclick="showMenu()">Upgrade menu </button>
     <button class="go alt" onclick="startMission()">Play again now</button>
     <button class="go alt" onclick="showMain()">◀ Main menu</button>`;
+  if (game.result === "win") confetti(60);
+  fresh();
 }
 
 // If style.css is missing or an old copy, say so instead of showing a broken page.
@@ -1224,5 +1237,54 @@ if (
     "afterbegin",
     '<p style="background:#ffc933;color:#1e1a3c;padding:10px;margin:0;font:700 16px sans-serif;text-align:center">The game styles did not load. Upload the newest style.css next to index.html and game.js, then refresh (Ctrl+Shift+R).</p>',
   );
+
+/* ---------- FUN STUFF: sky, sparkles, confetti, screen pop-in ---------- */
+const calmMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function fresh() {
+  app.classList.add("fresh");
+  app
+    .querySelectorAll(".card,.go,.hero,h1,.back")
+    .forEach((el, i) => el.style.setProperty("--i", Math.min(i, 8)));
+  setTimeout(() => app.classList.remove("fresh"), 1200);
+}
+function spark(x, y) {
+  if (calmMotion()) return;
+  for (let i = 0; i < 6; i++) {
+    const s = document.createElement("span"),
+      a = (i / 6) * 6.28 + Math.random();
+    s.className = "spark";
+    s.textContent = ["⭐", "✨", "🌟"][i % 3];
+    s.style.cssText = `left:${x}px;top:${y}px;--x:${Math.cos(a) * 60}px;--y:${Math.sin(a) * 60}px`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 800);
+  }
+}
+document.addEventListener("click", (e) => {
+  if (e.target.closest("button")) spark(e.clientX, e.clientY);
+});
+function confetti(n = 30) {
+  if (calmMotion()) return;
+  const bits = ["🎉", "⭐", "🌟", "🚀", "🪐", "✨"];
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement("span");
+    c.className = "conf";
+    c.textContent = bits[i % bits.length];
+    c.style.cssText = `left:${Math.random() * 100}vw;font-size:${18 + Math.random() * 18}px;--x:${Math.random() * 160 - 80}px;--r:${Math.random() * 720}deg;--t:${2 + Math.random() * 1.5}s;animation-delay:${Math.random() * 0.5}s`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4400);
+  }
+}
+(function buildSky() {
+  const sky = document.createElement("div");
+  sky.className = "sky";
+  sky.setAttribute("aria-hidden", "true");
+  let h = "";
+  for (let i = 0; i < 16; i++)
+    h += `<i class="st" style="left:${Math.random() * 100}%;top:${Math.random() * 55}%;animation-delay:${-Math.random() * 3}s"></i>`;
+  h +=
+    '<span class="fly" style="top:70%">🚀</span><span class="fly f2" style="top:35%">🛸</span><span class="fly f3" style="top:12%">🛰️</span><i class="shoot" style="left:85%;top:8%"></i><i class="shoot" style="left:60%;top:22%;animation-delay:-3s"></i>';
+  sky.innerHTML = h;
+  document.body.insertBefore(sky, app);
+})();
 
 showMain();
