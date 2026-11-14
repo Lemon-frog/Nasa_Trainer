@@ -278,6 +278,147 @@ const QUIZ = [
   },
 ];
 
+/* ---------- VISUALS: emergency stages + live base scene ---------- */
+// Emoji "pictures" for each emergency: the problem, then the result of each grade.
+const EM_VIS = {
+  "Air leak!": {
+    problem: ["🏠", "💨", "💨"],
+    good: ["🔧", "✨", "🏠"],
+    ok: ["🚪", "🔒", "💨"],
+    bad: ["⚙️", "💥", "💨"],
+  },
+  "Surprise particle burst!": {
+    problem: ["☀️", "⚡", "⚡"],
+    good: ["🛡️", "🧑‍🚀", "✨"],
+    ok: ["🏠", "🧑‍🚀", "⚡"],
+    bad: ["🧪", "☢️", "😵"],
+  },
+  "Greenhouse pump broke!": {
+    problem: ["🌱", "🚰", "❌"],
+    good: ["🔧", "🌿", "✨"],
+    ok: ["🪣", "🌱", "😓"],
+    bad: ["📡", "🥀", "⏳"],
+  },
+  "Dusty solar panels!": {
+    problem: ["🌪️", "☀️", "🟫"],
+    good: ["🤖", "☀️", "✨"],
+    ok: ["🧑‍🚀", "🧽", "☢️"],
+    bad: ["🟫", "🔋", "📉"],
+  },
+};
+// kind: "problem" | "good" | "ok" | "bad"
+function stage(title, kind) {
+  const set = (EM_VIS[title] || {})[kind] || ["🚨"];
+  return `<div class="stage st-${kind}">${set.map((e, i) => `<span style="animation-delay:${i * 0.15}s">${e}</span>`).join("")}</div>`;
+}
+
+// What today's power plan will do (used for the live scene and the preview chips)
+function preview() {
+  const a = game.alloc,
+    ev = todayEvent();
+  const storm = ev?.type === "storm";
+  return {
+    air: -4 + 2 * a.L + a.G,
+    food: -2 + (2 + lv("seeds")) * a.G,
+    hit: storm ? Math.max(0, 5 - lv("walls") - 2 * a.S) : 0,
+    storm,
+  };
+}
+
+function baseScene(noChips, fx = {}) {
+  const a = game.alloc,
+    ev = todayEvent(),
+    pv = preview();
+  const weather = ev?.type || "calm";
+  const damaged = (game.penalty[game.sol] || 0) > 0;
+
+  // Weather layer
+  let sky = "";
+  if (weather === "calm") sky = `<div class="sunl">☀️</div>`;
+  if (weather === "dust")
+    sky = [0, 1, 2, 3]
+      .map(
+        (i) =>
+          `<div class="dustc" style="top:${8 + i * 22}px;animation-delay:${-i * 1.7}s">🌪️</div>`,
+      )
+      .join("");
+  if (weather === "storm") {
+    sky = `<div class="sunl flare">☀️</div>`;
+    sky += Array.from({ length: 9 }, (_, i) => {
+      const cls = pv.hit > 0 ? "hit" : a.S > 0 ? "block" : "hit";
+      return `<i class="part ${cls}" style="left:${8 + i * 10}%;animation-delay:${-(i * 0.37)}s">⚡</i>`;
+    }).join("");
+  }
+
+  // Four modules. Brighter and busier when they get more power.
+  const pod = (cls, icon, n, extra) =>
+    `<div class="pod ${cls} ${n ? "on" : "off"} ${fx.pod === cls.slice(2) ? "boost" : ""}" style="--lvl:${n}">
+      ${n ? extra : '<span class="zzz">💤</span>'}
+      <div class="picon">${icon}</div>
+      <div class="lvl">${"●".repeat(n)}${"○".repeat(4 - n)}</div></div>`;
+  const bubbles = Array.from(
+    { length: a.L },
+    (_, i) =>
+      `<b class="bub" style="left:${20 + i * 18}%;animation-delay:${-i * 0.6}s">💨</b>`,
+  ).join("");
+  const plants = `<div class="plants">${Array.from({ length: a.G }, () => `<span style="font-size:${0.9 + a.G * 0.15}rem">${a.G >= 3 ? "🌿" : "🌱"}</span>`).join("")}</div>`;
+  const sparks = Array.from(
+    { length: a.R },
+    (_, i) =>
+      `<b class="spark" style="left:${15 + i * 20}%;animation-delay:${-i * 0.5}s">✨</b>`,
+  ).join("");
+  const pods =
+    pod("p-L", "💨", a.L, bubbles) +
+    pod("p-G", a.G ? "🌱" : "🥀", a.G, plants) +
+    pod("p-S", "🛡️", a.S, "") +
+    pod("p-R", "🔬", a.R, sparks);
+
+  // Crew: mood depends on how the base is doing and what the plan will do
+  const worry =
+    game.air <= 3
+      ? "💨 Air is low!"
+      : game.food <= 3
+        ? "🍎 So hungry..."
+        : game.dose >= 6
+          ? "☢️ Too much radiation"
+          : pv.hit > 0
+            ? "😖 Radiation will hit!"
+            : "";
+  const hurt = pv.hit > 0 || worry;
+  const crew = `<div class="crew ${hurt ? "hurt" : ""}">${worry ? `<div class="say">${worry}</div>` : ""}<span>🧑‍🚀</span><span>👩‍🚀</span><span>🧑‍🚀</span></div>`;
+
+  // Live preview chips: what this plan will do
+  const fmt = (n) => (n > 0 ? "+" + n : n);
+  const chip = (lbl, n, goodIfPos = true) =>
+    `<span class="chip ${(goodIfPos ? n >= 0 : n <= 0) ? "plus" : "minus"}">${lbl} ${fmt(n)}</span>`;
+  const shieldMsg = pv.storm
+    ? pv.hit > 0
+      ? `<span class="chip minus">☢️ Radiation +${pv.hit}</span>`
+      : `<span class="chip plus">🛡️ Storm blocked</span>`
+    : "";
+
+  return `<div class="scene w-${weather} ${fx.fresh ? "dawn" : ""} ${fx.zap ? "zapped" : ""}">
+      ${fx.zap ? '<div class="zapfx">🔋⚡</div>' : ""}
+      ${sky}
+      <div class="gnd"></div>
+      <div class="shield" style="--lvl:${a.S}"></div>
+      <div class="pods">${pods}</div>
+      ${damaged ? `<div class="smoke">💨🔧</div>` : ""}
+      ${crew}
+    </div>
+    ${noChips ? "" : `<div class="chips"><span class="fact">If you run today:</span>
+      ${chip("💨 Air", pv.air)}${chip("🍎 Food", pv.food)}${shieldMsg}</div>`}`;
+}
+
+function dayChips(l) {
+  if (!l) return "";
+  const f = (lbl, n, inv) =>
+    n
+      ? `<span class="chip ${(inv ? n > 0 : n < 0) ? "minus" : "plus"}">${lbl} ${n > 0 ? "+" : ""}${n}</span>`
+      : "";
+  return `<div class="chips">${f("💨 Air", l.air)}${f("🍎 Food", l.food)}${f("☢️ Radiation", l.dose, true)}${f("🔬 Research", l.sci)}</div>`;
+}
+
 /* ---------- STATE ---------- */
 let game = null;
 const app = document.getElementById("app");
@@ -427,6 +568,7 @@ function change(key, delta) {
   if (next < 0 || next > 4) return;
   if (delta > 0 && used() >= power()) return;
   game.alloc[key] = next;
+  game.fx = { pod: key };
   render();
 }
 
@@ -458,7 +600,8 @@ function finishDay(prenotes = []) {
   game.dose += dose;
   game.science += a.R;
   if (a.R) notes.push(`+${a.R} research point${a.R > 1 ? "s" : ""}.`);
-  game.report = `<b>Day ${game.sol} report:</b> ${notes.join(" ") || "A calm day."}`;
+  game.last = { air: airChange, food: foodChange, dose, sci: a.R };
+  game.report = `<b>Day ${game.sol} report:</b> ${notes.join(" ") || "A calm day."}${dayChips(game.last)}`;
 
   // Win or lose?
   if (game.air <= 0) game.result = "air";
@@ -474,6 +617,7 @@ function finishDay(prenotes = []) {
     }
   }
   if (game.result) award();
+  game.fx = { fresh: true };
   render();
   window.scrollTo(0, 0);
 }
@@ -483,7 +627,50 @@ function finishDay(prenotes = []) {
 function runSol() {
   const em = game.emergencies[game.sol];
   if (em) showEmergency(em);
-  else finishDay();
+  else playDay();
+}
+
+// A short "day passes" animation: sun crosses the sky, the base works, results float up.
+function playDay(prenotes = []) {
+  const a = game.alloc,
+    pv = preview();
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)
+    return finishDay(prenotes);
+  const dose = (a.S === 0 ? 0.25 : 0) + pv.hit;
+  const items = [
+    ["💨", pv.air, false],
+    ["🍎", pv.food, false],
+    ["☢️", dose, true],
+    ["🔬", a.R, false],
+  ].filter((x) => x[1]);
+  const floats =
+    items
+      .map((x, i) => {
+        const bad = x[2] ? x[1] > 0 : x[1] < 0;
+        return `<span class="flt ${bad ? "bad" : "good"}" style="left:${6 + i * 24}%;animation-delay:${1 + i * 0.2}s">${x[0]} ${x[1] > 0 ? "+" : ""}${x[1]}</span>`;
+      })
+      .join("") +
+    (pv.storm && pv.hit === 0
+      ? `<span class="flt good" style="left:38%;top:40px;animation-delay:0.9s">🛡️ Blocked!</span>`
+      : "");
+  const box = popup(`<h2>🌅 Day ${game.sol}</h2>
+    <div class="runwrap">${baseScene(true)}<div class="orb">☀️</div><div class="moon">🌙</div><div class="night"></div>
+    ${pv.hit > 0 ? '<div class="hitflash"></div>' : ""}${floats}</div>
+    <p class="fact" style="text-align:center">The crew works through the day… (tap to skip)</p>`);
+  box.querySelector(".alert").classList.add("dayrun");
+  let over = false;
+  const end = () => {
+    if (over) return;
+    over = true;
+    box.remove();
+    finishDay(prenotes);
+  };
+  box.onclick = end;
+  setTimeout(end, 3000);
+}
+
+function confetti() {
+  return `<div class="confetti" aria-hidden="true">${Array.from({ length: 18 }, (_, i) => `<i style="left:${(i * 37) % 100}%;animation-delay:${(i % 6) * 0.35}s;animation-duration:${2.6 + (i % 4) * 0.5}s">${["🎉", "✨", "⭐", "🟡"][i % 4]}</i>`).join("")}</div>`;
 }
 
 function popup(html) {
@@ -500,18 +687,19 @@ function showEmergency(em) {
   let left = total;
   const opts = [...em.choices].sort(() => Math.random() - 0.5); // shuffle so the best one moves around
   const box = popup(`
-    <h2>🚨 ${em.title}</h2><p>${em.text}</p>
+    <h2>🚨 ${em.title}</h2>${stage(em.title, "problem")}<p>${em.text}</p>
     <div class="timer"><i></i></div>
     <p class="count">Decide in <b>${left}</b> seconds!</p>
     ${opts.map((c, i) => `<button class="choice" data-i="${i}"><b>${c.label}</b><small>${c.cost}</small></button>`).join("")}
     <p class="fact">📡 Earth would take about ${DELAYS[game.sol % 4]} to answer, which is too slow. You decide!</p>`);
 
+  box.classList.add("alarm");
   const bar = box.querySelector(".timer i"),
     num = box.querySelector(".count b");
   const done = (choice, timedOut) => {
     clearInterval(timer);
     box.remove();
-    applyEmergency(choice, timedOut);
+    applyEmergency(em, choice, timedOut);
   };
   const timer = setInterval(() => {
     left--;
@@ -537,7 +725,7 @@ const GRADES = {
   bad: "❌ Risky choice",
 };
 
-function applyEmergency(choice, timedOut) {
+function applyEmergency(em, choice, timedOut) {
   const e = choice.effect;
   game.air = Math.max(0, Math.min(game.maxStock, game.air + (e.air || 0)));
   game.food = Math.max(0, Math.min(game.maxStock, game.food + (e.food || 0)));
@@ -557,26 +745,26 @@ function applyEmergency(choice, timedOut) {
   const grade = timedOut ? "bad" : choice.grade;
   const box = popup(`
     <h2 class="g-${grade}">${timedOut ? "⏰ Time ran out!" : GRADES[grade]}</h2>
+    ${stage(em.title, grade)}
     <p>${choice.result}</p><div class="chips">${chips}</div>
     <p class="fact">💡 ${choice.lesson}</p>
     <button class="go" id="cont">Continue ▶</button>`);
   box.querySelector("#cont").onclick = () => {
     box.remove();
-    finishDay([`🚨 ${timedOut ? "Time ran out! " : ""}${choice.result}`]);
+    playDay([`🚨 ${timedOut ? "Time ran out! " : ""}${choice.result}`]);
   };
 }
 
 /* ---------- MAIN MENU + HOW TO PLAY ---------- */
 function showMain() {
   game = null;
-  app.className = "";
   app.innerHTML = `
     <div class="hero">
       <div class="logo">🚀</div>
       <h1>Mars Outpost</h1>
       <p class="sub">Can you keep your crew alive for ${CONFIG.totalSols} days?</p>
     </div>
-    <button class="go" onclick="startMission()">▶ Play</button>
+    <button class="go" onclick="launch()">▶ Play</button>
     <button class="go alt" onclick="showMenu()">🔧 Upgrades <span class="pill">🔬 ${save.points}</span></button>
     <button class="go alt" onclick="showHow()">📖 How to play</button>`;
   window.scrollTo(0, 0);
@@ -616,10 +804,19 @@ function useBattery() {
   game.bonus[game.sol] = (game.bonus[game.sol] || 0) + 3;
   game.batteryDay = game.sol;
   game.battery--;
+  game.fx = { zap: true };
   render();
 }
 function startMission() {
   newGame();
+}
+// Rocket lift-off animation before the mission starts
+function launch() {
+  const l = document.querySelector(".hero .logo");
+  if (!l || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches))
+    return startMission();
+  l.classList.add("launch");
+  setTimeout(startMission, 900);
 }
 function buyUpgrade(k) {
   const u = UPGRADES.find((x) => x.key === k),
@@ -648,7 +845,6 @@ function resetSave() {
 
 function showMenu() {
   game = null;
-  app.className = "";
   const ups = UPGRADES.map((u) => {
     const L = lv(u.key),
       cost = u.costs[L],
@@ -708,8 +904,15 @@ function quizCard() {
   const d = game.sol,
     Q = QUIZ[game.quizOrder[(d - 1) % QUIZ.length]],
     res = game.quizRes[d];
-  if (res)
-    return `<div class="act"><b>📡 Question from Earth</b><p class="fact">${res.ok ? "✅ Correct! +1 research point." : "❌ Not quite. The answer is: " + Q.right + "."} ${Q.why}</p></div>`;
+  if (res) {
+    const fresh = res.fresh;
+    res.fresh = false;
+    const fx =
+      fresh && res.ok
+        ? '<span class="burst b1">✨</span><span class="burst b2">⭐</span><span class="burst b3">✨</span><span class="flt good" style="left:40%;top:4px">🔬 +1</span>'
+        : "";
+    return `<div class="act ${fresh ? (res.ok ? "right" : "wrong") : ""}">${fx}<b>📡 Question from Earth</b><p class="fact">${res.ok ? "✅ Correct! +1 research point." : "❌ Not quite. The answer is: " + Q.right + "."} ${Q.why}</p></div>`;
+  }
   if (!game.quizOpts[d])
     game.quizOpts[d] = [Q.right, ...Q.wrong].sort(() => Math.random() - 0.5);
   return `<div class="act"><b>📡 Quick question from Earth</b> <small>(+1 research point)</small><p>${Q.q}</p>
@@ -719,7 +922,7 @@ function answerQuiz(i) {
   const d = game.sol,
     Q = QUIZ[game.quizOrder[(d - 1) % QUIZ.length]];
   const ok = game.quizOpts[d][i] === Q.right;
-  game.quizRes[d] = { ok };
+  game.quizRes[d] = { ok, fresh: true };
   if (ok) game.science++;
   render();
 }
@@ -738,10 +941,12 @@ function startRover() {
     got = 0;
   const box =
     popup(`<h2>🤖 Rover sample mission</h2><p>Tap the rocks before they roll away!</p>
-    <p class="count">⏱️ <b>${left}</b>s · Samples: <span id="got">0</span></p><div class="arena"></div>`);
+    <div class="timer"><i></i></div>
+    <p class="count">⏱️ <b>${left}</b>s · Samples: <span id="got">0</span></p><div class="arena"><div class="rover">🤖</div></div>`);
   const arena = box.querySelector(".arena"),
     gotEl = box.querySelector("#got"),
-    num = box.querySelector(".count b");
+    num = box.querySelector(".count b"),
+    bar = box.querySelector(".timer i");
   const sp = setInterval(() => {
     const r = document.createElement("button");
     r.className = "rock";
@@ -751,6 +956,16 @@ function startRover() {
     r.onclick = () => {
       got++;
       gotEl.textContent = got;
+      gotEl.classList.remove("bump");
+      void gotEl.offsetWidth;
+      gotEl.classList.add("bump");
+      const f = document.createElement("i");
+      f.className = "plus1";
+      f.textContent = "+1 🪨";
+      f.style.left = r.style.left;
+      f.style.top = r.style.top;
+      arena.appendChild(f);
+      setTimeout(() => f.remove(), 700);
       r.remove();
     };
     arena.appendChild(r);
@@ -759,6 +974,7 @@ function startRover() {
   const t = setInterval(() => {
     left--;
     num.textContent = left;
+    bar.style.width = (left / 10) * 100 + "%";
     if (left > 0) return;
     clearInterval(t);
     clearInterval(sp);
@@ -766,6 +982,7 @@ function startRover() {
     game.science += pts;
     box.querySelector(".alert").innerHTML =
       `<h2>🪨 ${got} samples collected!</h2>
+      <div class="stage st-${pts ? "good" : "ok"}"><span>🤖</span><span>🪨</span><span>${pts ? "✨" : "😅"}</span></div>
       <p>${pts ? "+" + pts + " research points!" : "No points this time. Try again tomorrow!"}</p>
       <p class="fact">Real rovers like Curiosity and Perseverance collect rocks to study Mars. Their power is limited too.</p>
       <button class="go" id="ok">Back to base ▶</button>`;
@@ -774,135 +991,6 @@ function startRover() {
       render();
     };
   }, 1000);
-}
-
-/* ---------- SIDE PANELS: news + messages from Earth ---------- */
-// Real facts about Mars and NASA missions. Add your own!
-const NEWS = [
-  "Curiosity rover has explored Gale Crater on Mars since 2012.",
-  "Perseverance landed in Jezero Crater in February 2021.",
-  "The Ingenuity helicopter made the first powered flights on another planet.",
-  "Mars sunsets look blue, the opposite of Earth’s.",
-  "Mars gravity is only about 38% of Earth’s gravity.",
-  "Mars looks red because its dust contains iron oxide, like rust.",
-  "Olympus Mons on Mars is the tallest known volcano in the solar system.",
-  "Mars has two small moons named Phobos and Deimos.",
-  "NASA’s InSight lander recorded marsquakes, Mars’ version of earthquakes.",
-  "Astronauts have lived on the Space Station nonstop since November 2000.",
-  "NASA’s Artemis program plans to send astronauts back to the Moon.",
-  "DONKI is NASA’s database that logs solar flares and other space weather.",
-];
-const MESSAGES = [
-  {
-    from: "Mission Control",
-    icon: "🧑‍🚀",
-    text: "Good morning, crew! Check the forecast before you share out power.",
-  },
-  {
-    from: "Dr. Rivera, solar scientist",
-    icon: "☀️",
-    text: "We watch the Sun every day. Flares can reach Mars fast, so shelter early.",
-  },
-  {
-    from: "Your family",
-    icon: "🏠",
-    text: "We looked up at Mars tonight. It was a tiny red dot. We are so proud of you!",
-  },
-  {
-    from: "Class 5, Earth School",
-    icon: "🏫",
-    text: "We are growing beans in class, just like your greenhouse!",
-  },
-  {
-    from: "Engineer Sam",
-    icon: "🔧",
-    text: "Tip: spare parts and a calm plan fix most problems.",
-  },
-  {
-    from: "Mission Control",
-    icon: "🧑‍🚀",
-    text: "Remember: radiation dose never goes down. Shelter is cheaper than going home.",
-  },
-  {
-    from: "Chef Amara",
-    icon: "🍲",
-    text: "One greenhouse unit feeds the crew for a day. Plants make a little air too!",
-  },
-  {
-    from: "Mission Control",
-    icon: "🧑‍🚀",
-    text: "Our messages take minutes to reach you. You are the experts on the ground.",
-  },
-];
-
-// Messages react to what is happening in the game.
-function todaysMessages() {
-  const ev = todayEvent(),
-    nx = game.events[game.sol + 1],
-    MC = { from: "Mission Control", icon: "🧑‍🚀" };
-  let hot = null;
-  if (ev?.type === "storm")
-    hot = {
-      ...MC,
-      text: "RADIATION ALERT! Everyone to the shelter. Power it up now!",
-      urgent: true,
-    };
-  else if (nx?.type === "storm")
-    hot = {
-      ...MC,
-      text: "Our solar scouts spotted a flare. A storm reaches you tomorrow. Plan your shelter power.",
-      urgent: true,
-    };
-  else if (nx?.type === "dust")
-    hot = {
-      ...MC,
-      text: "A big dust cloud is rolling in. Tomorrow’s sunshine will be weak. Stock up today.",
-      urgent: true,
-    };
-  else if (game.air <= 3)
-    hot = {
-      ...MC,
-      text: "Your air is getting low. Put more power into life support!",
-      urgent: true,
-    };
-  else if (game.food <= 3)
-    hot = {
-      ...MC,
-      text: "Food is low. Don’t forget the greenhouse!",
-      urgent: true,
-    };
-  else if (game.dose >= 6)
-    hot = {
-      ...MC,
-      text: "Your radiation dose is high. Spend more time in the shelter.",
-      urgent: true,
-    };
-  const list = [
-    hot || MESSAGES[game.sol % MESSAGES.length],
-    MESSAGES[(game.sol + 3) % MESSAGES.length],
-  ];
-  return list.map((m, i) => ({ ...m, ago: DELAYS[(game.sol + i) % 4] }));
-}
-const msgHTML = (m) =>
-  `<div class="msg ${m.urgent ? "urgent" : ""}"><span class="av">${m.icon}</span><div><b>${m.from}</b><p>${m.text}</p><small>Sent ${m.ago} ago</small></div></div>`;
-function messagePanel() {
-  return `<div class="card"><h2>📬 From Earth</h2>${todaysMessages().map(msgHTML).join("")}</div>`;
-}
-function mobileMsg() {
-  return `<div class="card only-narrow">${msgHTML(todaysMessages()[0])}</div>`;
-}
-function newsPanel() {
-  const ev = todayEvent(),
-    lines = [];
-  if (ev?.type === "storm")
-    lines.push("BREAKING: Radiation storm hits the outpost!");
-  else if (ev?.type === "dust")
-    lines.push("BREAKING: Dust storm cuts solar power!");
-  else lines.push(`Crew has earned ${game.science} research points so far.`);
-  for (let i = 0; i < 3; i++)
-    lines.push(NEWS[(game.sol * 3 + i) % NEWS.length]);
-  return `<div class="card"><h2>📰 Mars Daily</h2><small class="fact">Day ${game.sol} edition</small>
-    ${lines.map((l, i) => `<p class="headline ${i === 0 && l.startsWith("BREAKING") ? "breaking" : ""}">${l}</p>`).join("")}</div>`;
 }
 
 /* ---------- DRAWING THE SCREEN ---------- */
@@ -920,6 +1008,8 @@ function render() {
   const ev = todayEvent(),
     next = game.events[game.sol + 1],
     p = power();
+  const fx = game.fx || {}; // one-time effects (new day, battery zap, power change)
+  game.fx = {};
 
   let eventCard = "";
   if (ev?.type === "storm")
@@ -946,47 +1036,54 @@ function render() {
     </div>`,
   ).join("");
 
-  app.className = "wide";
-  app.innerHTML = `<div class="layout"><aside class="side">${newsPanel()}</aside><div class="center">
+  app.innerHTML = `
     <button class="back" onclick="quitMission()">◀ Menu</button>
-    ${mobileMsg()}
     <h1>🚀 Mars Outpost</h1>
     <p class="sub">Keep your crew alive for ${CONFIG.totalSols} days on Mars.</p>
     <div class="card">
       <div class="progress"><i style="width:${(game.sol / CONFIG.totalSols) * 100}%"></i></div>
       <p class="fact">Day ${game.sol} of ${CONFIG.totalSols} · Research points: <b>${game.science}</b></p>
-      <div class="meters">
+      <div class="meters ${fx.fresh ? "fresh" : ""}">
         ${meter("💨", "Air", game.air, game.maxStock, (v) => v <= 3)}
         ${meter("🍎", "Food", game.food, game.maxStock, (v) => v <= 3)}
         ${meter("☢️", "Radiation", game.dose, CONFIG.doseLimit, (v) => v >= 6)}
       </div>
       <p class="fact">Radiation dose never goes down. At ${CONFIG.doseLimit}, the crew must go home.</p>
     </div>
-    ${game.report ? `<div class="card news">${game.report}</div>` : ""}
+    ${game.report ? `<div class="card news ${fx.fresh ? "slide" : ""}">${game.report}</div>` : ""}
+    <div class="card">${baseScene(false, fx)}</div>
     ${forecastStrip()}
     ${game.penalty[game.sol] ? `<div class="card warn"><h2>🔧 Damage from yesterday</h2><p>Broken equipment means <b>${game.penalty[game.sol]} less power</b> today.</p></div>` : ""}
     ${eventCard}
     <div class="card">
       <h2>⚡ Power: ${used()} of ${p} units</h2>
-      <div class="cells">${cells}</div>
+      <div class="cells ${fx.zap ? "zap" : ""}">${cells}</div>
       ${systems}
       <p class="fact">📡 Messages from Earth take about ${DELAYS[game.sol % 4]} to arrive, so you decide.</p>
       <div class="acts">${quizCard()}${roverButton()}</div>
       ${game.battery > 0 && game.batteryDay !== game.sol ? `<button class="item" onclick="useBattery()">🔋 Use battery pack (+3 power today)</button>` : ""}
       <button class="go" onclick="runSol()">Run Day ${game.sol} ▶</button>
-    </div></div><aside class="side">${messagePanel()}</aside></div>`;
+    </div>`;
 }
 
 function renderEnd() {
-  app.className = "";
   const msg = {
     win: `🎉 You made it! ${game.science} research points.`,
     air: "💨 The air ran out.",
     food: "🍎 The food ran out.",
     dose: "☢️ The crew reached the radiation limit and had to go home.",
   }[game.result];
+  const endVis = {
+    win: ["🏠", "🎉", "🧑‍🚀"],
+    air: ["🏠", "💨", "😵"],
+    food: ["🏠", "🥀", "😫"],
+    dose: ["☢️", "🚀", "🌍"],
+  }[game.result];
+  const endKind = game.result === "win" ? "good" : "bad";
   app.innerHTML = `
+    ${game.result === "win" ? confetti() : ""}
     <h1>${msg}</h1>
+    <div class="stage st-${endKind}">${endVis.map((e, i) => `<span style="animation-delay:${i * 0.15}s">${e}</span>`).join("")}</div>
     <div class="card"><h2>What you learned</h2>
       <p>🔋 <b>Power is limited.</b> Every unit for science was a unit not used to stay safe.</p>
       <p>☢️ <b>Space weather matters.</b> Mission planners watch NASA’s DONKI database for flares, then decide when to shelter.</p>
