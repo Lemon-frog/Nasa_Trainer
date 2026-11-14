@@ -933,3 +933,53 @@ button.choice small {
     transition: none !important;
   }
 }
+
+/* ===== Kid-friendly motion (all switched off by prefers-reduced-motion above) ===== */
+.sky{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.sky .st{position:absolute;width:6px;height:6px;background:#fff;border-radius:50%;animation:twinkle2 2.4s ease-in-out infinite}
+@keyframes twinkle2{50%{transform:scale(1.8);opacity:.35}}
+.sky .fly{position:absolute;left:-60px;font-size:34px;animation:rocketfly 18s linear infinite}
+.sky .f2{animation-duration:27s;animation-delay:-9s}
+.sky .f3{animation-duration:36s;animation-delay:-20s;font-size:26px}
+@keyframes rocketfly{to{transform:translate(calc(100vw + 120px),-120px)}}
+.sky .shoot{position:absolute;width:90px;height:3px;border-radius:3px;background:linear-gradient(90deg,#fff,transparent);opacity:0;animation:shoot 6s ease-in infinite}
+@keyframes shoot{0%{transform:translate(0,0) rotate(25deg);opacity:0}4%{opacity:1}18%{transform:translate(-320px,150px) rotate(25deg);opacity:0}100%{opacity:0}}
+@keyframes popin{from{transform:scale(.7) translateY(18px);opacity:0}}
+.fresh :is(.card,.go,.hero,h1,.back){animation:popin .55s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes floaty{50%{transform:translateY(-10px) rotate(-3deg)}}
+.hero .logo{animation:floaty 3.2s ease-in-out infinite}
+.hero h1{animation:floaty 4s ease-in-out infinite}
+@keyframes beat{50%{transform:scale(1.04)}}
+.hero + button.go,.card > button.go:last-child:not(.alt){animation:beat 1.6s ease-in-out infinite}
+@keyframes wiggle{25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
+button.go.alt:hover,button.opt:hover,button.choice:hover,button.item:hover{animation:wiggle .35s}
+@keyframes jitter{25%{transform:translate(-2px,1px) rotate(-6deg)}75%{transform:translate(2px,-1px) rotate(6deg)}}
+.meter.low .icon,.ftile.storm span,.ftile.dust span,.astro:not(.ok){animation:jitter .6s infinite}
+.meter .bar i{background-image:linear-gradient(90deg,transparent,#ffffff66,transparent);background-size:60px 100%;background-repeat:repeat-x;animation:shine 2s linear infinite}
+@keyframes shine{to{background-position:60px 0}}
+.tdots i.now{animation:nowdot 1s ease-in-out infinite}
+@keyframes nowdot{0%,100%{transform:scale(1.35)}50%{transform:scale(1.75)}}
+.ftile.now,.astro.ok{animation:bob 2s ease-in-out infinite}
+.headline.breaking{animation:blink 1s infinite}
+@keyframes alarm{50%{box-shadow:4px 4px 0 var(--coral),0 0 22px 4px #ff5a6e99}}
+.card.warn{animation:alarm 1.2s ease-in-out infinite}
+.emo{margin-left:auto;font-size:1.3rem}
+.roam{animation:roam 14s linear infinite alternate}
+@keyframes roam{to{transform:translateX(200px)}}
+@keyframes fadein{from{opacity:0}}
+.overlay{animation:fadein .2s}
+.alert{animation:popin .45s cubic-bezier(.3,1.6,.5,1),shake .4s .45s}
+.count b{display:inline-block;animation:tick 1s infinite}
+@keyframes tick{0%{transform:scale(1.4)}100%{transform:scale(1)}}
+.rock{font-size:1.7rem;line-height:1;animation:rollrock 1.3s linear}
+@keyframes rollrock{0%{transform:scale(.3)}15%{transform:scale(1)}100%{transform:translateX(40px) rotate(260deg)}}
+.chip{animation:popin .4s both}
+.trophy{text-align:center;font-size:5rem;line-height:1.2}
+.trophy.win{animation:hop 1s ease-in-out infinite}
+.trophy.lose{animation:jitter 1.2s ease-in-out infinite}
+@keyframes hop{50%{transform:translateY(-18px) scale(1.1)}}
+.spark,.conf{position:fixed;z-index:50;pointer-events:none;line-height:1}
+.spark{animation:burst .7s ease-out forwards}
+@keyframes burst{to{transform:translate(var(--x),var(--y)) scale(.4) rotate(180deg);opacity:0}}
+.conf{top:-30px;animation:fall var(--t) linear forwards}
+@keyframes fall{to{transform:translate(var(--x),105vh) rotate(var(--r))}}
