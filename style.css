@@ -1,0 +1,935 @@
+/* ===== Mars Outpost: field-console look =====
+   Change the colors here to re-theme everything. */
+:root {
+  --ink: #1e1a3c; /* outlines + dark panels */
+  --paper: #f4f1ff; /* card background */
+  --paper2: #e4defa; /* tiles inside cards */
+  --muted: #5d5886; /* small text on paper */
+  --sun: #ffc933; /* power, buttons */
+  --mint: #35d8a0; /* good, food */
+  --coral: #ff5a6e; /* danger, radiation */
+  --sky: #62c3ff; /* air */
+  --lilac: #b9a8ff; /* science */
+  --edge: 3px solid var(--ink);
+  --pop: 4px 4px 0 var(--ink);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background: var(--ink);
+  font:
+    17px/1.45 "Nunito",
+    "Trebuchet MS",
+    system-ui,
+    sans-serif;
+}
+h1,
+h2,
+.big {
+  font-family: "Lilita One", "Trebuchet MS", system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+h1 {
+  font-size: 2.4rem;
+  margin: 6px 0 2px;
+  color: #fff;
+  text-shadow: 3px 3px 0 var(--ink);
+}
+h2 {
+  font-size: 1.3rem;
+  margin: 0 0 6px;
+}
+p {
+  margin: 6px 0;
+}
+.sub {
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 1px 1px 0 var(--ink);
+  margin: 0 0 12px;
+}
+.ic {
+  width: 1.35em;
+  height: 1.35em;
+  vertical-align: -0.3em;
+  flex: none;
+}
+
+/* background scenery (set in index.html) */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+}
+
+main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 16px 14px 70px;
+}
+footer {
+  text-align: center;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 0 16px 18px;
+  max-width: 680px;
+  margin: 0 auto;
+  text-shadow: 1px 1px 0 var(--ink);
+}
+
+/* ===== Cards ===== */
+.card {
+  background: var(--paper);
+  border: var(--edge);
+  border-radius: 14px;
+  box-shadow: var(--pop);
+  padding: 14px;
+  margin: 14px 0;
+}
+.card.warn {
+  background: #ffe1e5;
+  border-color: var(--ink);
+  box-shadow: 4px 4px 0 var(--coral);
+}
+.card.news {
+  background: #fff3c4;
+}
+.fact {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.hud {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: #fff;
+  box-shadow: var(--pop);
+}
+.hud .fact {
+  color: #c9c3ee;
+}
+
+/* ===== HUD meters ===== */
+.progress {
+  height: 10px;
+  background: #3b3566;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.progress i {
+  display: block;
+  height: 100%;
+  background: var(--sun);
+  transition: width 0.4s;
+}
+.meters {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+.meter {
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+.meter .icon {
+  color: var(--sky);
+}
+.meter:nth-child(2) .icon {
+  color: var(--mint);
+}
+.meter:nth-child(3) .icon {
+  color: var(--coral);
+}
+.meter .bar {
+  height: 14px;
+  background: #3b3566;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.meter .bar i {
+  display: block;
+  height: 100%;
+  background: var(--mint);
+  transition: width 0.5s;
+}
+.meter.low .bar i {
+  background: var(--coral);
+}
+.meter.low .label {
+  color: var(--coral);
+  font-weight: 800;
+  animation: blink 1s infinite;
+}
+.meter .label {
+  font-weight: 700;
+  min-width: 7.5em;
+  text-align: right;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ===== Outpost scene + power ===== */
+.scene {
+  display: block;
+  width: calc(100% + 28px);
+  margin: -14px -14px 10px;
+  border-bottom: var(--edge);
+  border-radius: 11px 11px 0 0;
+}
+.scene .rays {
+  animation: blink 0.8s infinite;
+}
+.cells {
+  display: flex;
+  gap: 6px;
+  margin: 6px 0 12px;
+  flex-wrap: wrap;
+}
+.cell {
+  width: 22px;
+  height: 30px;
+  border: 3px solid var(--ink);
+  border-radius: 5px;
+  background: #fff;
+}
+.cell.on {
+  background: var(--sun);
+}
+.cell.dead {
+  background: repeating-linear-gradient(45deg, #cfc9ee 0 4px, #e4defa 4px 8px);
+  border-style: dashed;
+  opacity: 0.6;
+}
+
+.mods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.mod {
+  border: var(--edge);
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--paper2);
+  display: flex;
+  flex-direction: column;
+}
+.m-L {
+  background: #d7efff;
+}
+.m-G {
+  background: #d2f7e6;
+}
+.m-S {
+  background: #fff0b8;
+}
+.m-R {
+  background: #e6dfff;
+}
+.mh {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+.hint {
+  font-size: 0.8rem;
+  line-height: 1.25;
+  color: var(--muted);
+  margin: 4px 0 8px;
+  flex: 1;
+}
+.slots {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.slots i {
+  flex: 1;
+  height: 10px;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  background: #fff;
+}
+.slots i.on {
+  background: var(--sun);
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font:
+    400 1.6rem "Lilita One",
+    sans-serif;
+}
+.proj {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: center;
+  margin-top: 12px;
+  padding: 8px 10px;
+  border: 3px dashed var(--ink);
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+.proj b {
+  flex-basis: 100%;
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.proj .neg {
+  color: #d6293f;
+}
+.proj .pos {
+  color: #108a62;
+}
+
+/* ===== Buttons ===== */
+button {
+  font:
+    800 1rem "Nunito",
+    sans-serif;
+  color: var(--ink);
+  background: var(--sun);
+  border: var(--edge);
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--ink);
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s;
+}
+button:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+button:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--ink);
+}
+button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+  box-shadow: none;
+}
+.stepper button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  font:
+    400 1.6rem "Lilita One",
+    sans-serif;
+  background: #fff;
+}
+button.go {
+  width: 100%;
+  font:
+    400 1.3rem "Lilita One",
+    sans-serif;
+  padding: 12px;
+  margin-top: 12px;
+  background: var(--mint);
+}
+button.alt {
+  background: var(--paper);
+}
+button.back {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  background: var(--paper);
+}
+button.item {
+  width: 100%;
+  margin-top: 10px;
+  text-align: left;
+  background: #fff;
+}
+button.item small {
+  display: block;
+  font-weight: 600;
+  color: var(--muted);
+}
+button.opt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-top: 8px;
+  background: #fff;
+}
+button.buy {
+  min-width: 84px;
+  white-space: nowrap;
+}
+.pill {
+  background: var(--ink);
+  color: var(--sun);
+  border-radius: 20px;
+  padding: 2px 10px;
+  margin-left: 6px;
+  font-size: 0.9rem;
+}
+
+/* ===== Forecast ===== */
+.fgrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 8px 0;
+}
+.ftile {
+  background: var(--paper2);
+  border: var(--edge);
+  border-radius: 10px;
+  padding: 6px 2px;
+  text-align: center;
+}
+.ftile span {
+  display: block;
+  font:
+    400 1.5rem "Lilita One",
+    sans-serif;
+  line-height: 1.5;
+}
+.ftile small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.ftile.now {
+  background: #fff;
+  outline: 3px solid var(--sun);
+  outline-offset: 2px;
+}
+.ftile.storm {
+  background: #ffc4cc;
+}
+.ftile.storm span {
+  color: #d6293f;
+}
+.ftile.dust {
+  background: #ffd9a8;
+}
+.ftile.dust span {
+  color: #a85a10;
+}
+.advice {
+  border: var(--edge);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 700;
+}
+.advice.storm {
+  background: #ffc4cc;
+}
+.advice.dust {
+  background: #ffd9a8;
+}
+.advice.calm {
+  background: #c6f3e0;
+}
+
+/* ===== Activities ===== */
+.act {
+  background: var(--paper2);
+  border: var(--edge);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 10px;
+}
+.act p {
+  margin: 4px 0;
+}
+.arena {
+  position: relative;
+  height: 230px;
+  background: #8e3a3a;
+  border: var(--edge);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.rock {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border-radius: 50%;
+  background: #c4553b;
+  animation: pop 0.2s;
+}
+@keyframes pop {
+  from {
+    transform: scale(0.3);
+  }
+}
+
+/* ===== Shop rows ===== */
+.system {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 2px solid var(--paper2);
+}
+.system:first-of-type {
+  border-top: 0;
+}
+.system .icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--sun);
+  border: var(--edge);
+  border-radius: 10px;
+}
+.system .info {
+  flex: 1;
+}
+.system .info small {
+  display: block;
+  color: var(--muted);
+  line-height: 1.25;
+}
+.pips {
+  color: var(--ink);
+  letter-spacing: 3px;
+  font-size: 0.9rem;
+}
+
+/* ===== Popups ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: #1e1a3ccc;
+}
+.alert {
+  width: 100%;
+  max-width: 480px;
+  background: var(--paper);
+  border: var(--edge);
+  border-radius: 14px;
+  box-shadow: 6px 6px 0 var(--coral);
+  padding: 18px;
+  animation: shake 0.4s;
+}
+.alert h2 {
+  font-size: 1.6rem;
+  color: #d6293f;
+}
+.timer {
+  height: 16px;
+  background: #fff;
+  border: var(--edge);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 10px 0 4px;
+}
+.timer i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--coral);
+  transition: width 1s linear;
+}
+.count {
+  text-align: center;
+  margin: 0 0 8px;
+}
+.count b {
+  font:
+    400 1.7rem "Lilita One",
+    sans-serif;
+}
+button.choice {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-top: 10px;
+  background: #fff;
+}
+button.choice small {
+  display: block;
+  font-weight: 700;
+  color: #d6293f;
+}
+@keyframes shake {
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+.g-good {
+  color: #108a62 !important;
+}
+.g-ok {
+  color: #a87a00 !important;
+}
+.g-bad {
+  color: #d6293f !important;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+.chip {
+  padding: 3px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+.chip.plus {
+  background: #c6f3e0;
+}
+.chip.minus {
+  background: #ffc4cc;
+}
+
+/* ===== Side panels ===== */
+.headline {
+  margin: 10px 0;
+  padding-left: 10px;
+  border-left: 5px solid var(--sun);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.headline.breaking {
+  border-color: var(--coral);
+  color: #d6293f;
+  font-weight: 800;
+}
+.msg {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 2px solid var(--paper2);
+}
+.msg:first-of-type {
+  border-top: 0;
+}
+.msg .av {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border: var(--edge);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font:
+    400 1.1rem "Lilita One",
+    sans-serif;
+}
+.msg p {
+  margin: 2px 0;
+  font-size: 0.93rem;
+}
+.msg small {
+  color: var(--muted);
+}
+.msg.urgent {
+  background: #ffe1e5;
+  border-radius: 10px;
+  padding: 8px;
+}
+.side .card {
+  margin-top: 0;
+}
+
+/* ===== Main menu ===== */
+.hero {
+  text-align: center;
+  padding: 6vh 0 3vh;
+}
+.hero .logo {
+  width: 96px;
+  height: 96px;
+}
+.hero h1 {
+  font-size: 3.4rem;
+  margin: 8px 0;
+}
+
+/* ===== Side visuals (gentle, slow motion) ===== */
+.live {
+  font: 800 0.65rem "Nunito", sans-serif;
+  background: var(--coral);
+  color: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  padding: 1px 7px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.5px;
+  animation: blink 2s infinite;
+}
+.cam,
+.sig {
+  display: block;
+  width: 100%;
+  margin: 6px 0;
+  border: var(--edge);
+  border-radius: 10px;
+}
+.sig {
+  background: #2b2a5e;
+}
+.cam .rays {
+  animation: blink 1.4s infinite;
+}
+.cam-sun {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: glow 4s ease-in-out infinite alternate;
+}
+@keyframes glow {
+  to {
+    transform: scale(1.08);
+  }
+}
+.pt {
+  animation: zap 1.9s linear infinite;
+}
+@keyframes zap {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  85% {
+    transform: translateY(var(--d));
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--d));
+    opacity: 0;
+  }
+}
+.puff {
+  animation: puff 3s ease-out infinite;
+}
+@keyframes puff {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-22px);
+    opacity: 0;
+  }
+}
+.sway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: swayy 3s ease-in-out infinite alternate;
+}
+@keyframes swayy {
+  to {
+    transform: rotate(7deg);
+  }
+}
+.twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: twink 1.8s ease-in-out infinite;
+}
+@keyframes twink {
+  50% {
+    transform: scale(1.35);
+    opacity: 0.55;
+  }
+}
+.shield {
+  stroke-dasharray: 7 7;
+  animation: dash 4s linear infinite;
+}
+@keyframes dash {
+  to {
+    stroke-dashoffset: -56;
+  }
+}
+.dish {
+  animation: blink 1.2s infinite;
+}
+.drift {
+  animation: drift 9s linear infinite alternate;
+}
+@keyframes drift {
+  to {
+    transform: translateX(30px);
+  }
+}
+.pkt {
+  animation: mail 5s linear infinite;
+}
+@keyframes mail {
+  from {
+    transform: translateX(150px);
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+/* Crew faces */
+.crew-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  background: var(--paper2);
+  border: var(--edge);
+  border-radius: 10px;
+  padding: 8px 4px 0;
+  overflow: hidden;
+}
+.astro {
+  width: 30%;
+  max-width: 84px;
+  animation: bob 3s ease-in-out infinite;
+}
+@keyframes bob {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+.crew-note {
+  font-weight: 800;
+  text-align: center;
+  margin: 8px 0 0;
+}
+.mood-ok {
+  color: #108a62;
+}
+.mood-bad {
+  color: #d6293f;
+}
+
+/* Mission trail */
+.trail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+.tl {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #c9c3ee;
+  text-transform: uppercase;
+}
+.tdots {
+  display: flex;
+  flex: 1;
+  gap: 3px;
+  justify-content: space-between;
+}
+.tdots i {
+  flex: 1;
+  max-width: 16px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #3b3566;
+  border: 2px solid #3b3566;
+}
+.tdots i.storm {
+  border-color: var(--coral);
+  background: #ff5a6e66;
+}
+.tdots i.dust {
+  border-color: #ff9a4d;
+  background: #ff9a4d66;
+}
+.tdots i.done {
+  background: var(--sun);
+  border-color: var(--sun);
+}
+.tdots i.now {
+  background: #fff;
+  border-color: var(--sun);
+  transform: scale(1.35);
+  box-shadow: 0 0 0 3px #ffc93366;
+}
+
+/* ===== Layout ===== */
+@media (min-width: 1000px) {
+  main.wide {
+    max-width: 1200px;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 640px) 270px;
+    gap: 18px;
+    justify-content: center;
+    align-items: start;
+  }
+  .side {
+    position: sticky;
+    top: 12px;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    padding: 0 6px 6px 0;
+    scrollbar-width: thin;
+  }
+  .only-narrow {
+    display: none;
+  }
+}
+@media (max-width: 999px) {
+  .side {
+    display: none;
+  }
+}
+@media (max-width: 440px) {
+  .hero h1 {
+    font-size: 2.6rem;
+  }
+  .hint {
+    display: none;
+  }
+  .meter .label {
+    min-width: 6.5em;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
